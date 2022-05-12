@@ -1,49 +1,79 @@
 import ACTION_TYPES from '../actions/actionTypes';
 
 const initialState = {
-  todo: [
-    {
-      id: 0,
-      name: 'test string',
-      isChek: false,
-    },
-  ],
-  isValid: true,
+  todo: [],
+  isFatching: false,
+  error: null,
+  edit:null
 };
-
-let serial = 1;
 
 const todoReducer = (state = initialState, action) => {
   const { type } = action;
   switch (type) {
-    case ACTION_TYPES.TODO_CREATE: {
-      const { newValues } = action;
+    // **********create-todo
+    case ACTION_TYPES.CREATE_TODO_REQUEST: {
+      return { ...state, isFatching: true, error: null };
+    }
+    case ACTION_TYPES.CREATE_TODO_SUCCESS: {
+      const { newTextTodo } = action;
       const { todo } = state;
-      const newTodo = [...todo, { ...newValues, isChek: false, id: serial++ }];
-      return { ...state, todo: newTodo };
+      const newTodo = [...todo, { ...newTextTodo }];
+      return { ...state, todo: newTodo, isFatching: false };
+    }
+    case ACTION_TYPES.CREATE_TODO_ERROR: {
+      const { err } = action;
+      return { ...state, error: err, isFatching: false };
     }
 
-    case ACTION_TYPES.TODO_CHEK: {
-      const { newTodoInfo, idTodo } = action;
-      const { todo } = state;
+    // ********get-todo
+    case ACTION_TYPES.GET_TODO_REQUEST: {
+      return { ...state, isFatching: true, error: null };
+    }
+    case ACTION_TYPES.GET_TODO_SUCCESS: {
+      const { newTodos: valueTodo } = action;
 
-      const newTodo = [...todo];
-      const todoIndex = newTodo.findIndex(v => v.id === idTodo);
-      newTodo[todoIndex] = { ...newTodo[todoIndex], ...newTodoInfo };
-
-      return { ...state, todo: newTodo };
+      const getTodo = [...valueTodo];
+      return { ...state, todo: getTodo, isFatching: false };
+    }
+    case ACTION_TYPES.GET_TODO_ERROR: {
+      const { err } = action;
+      return { ...state, error: err, isFatching: false };
     }
 
-    case ACTION_TYPES.TODO_DELETE: {
-      const { idTodo } = action;
+    // **********isdone-todo
+    case ACTION_TYPES.ISDONE_TODO_REQUEST: {
+      return { ...state, isFatching: true, error: null };
+    }
+    case ACTION_TYPES.ISDONE_TODO_SUCCESS: {
+      const { updateTodo } = action;
       const { todo } = state;
       const newTodo = [...todo];
+      const todoIndex = newTodo.findIndex(t => t.id === updateTodo.id);
+      newTodo[todoIndex] = { ...updateTodo };
+      return { ...state, todo: newTodo, isFatching: false };
+    }
+    case ACTION_TYPES.ISDONE_TODO_ERROR: {
+      const { err } = action;
+      return { ...state, error: err, isFatching: false };
+    }
 
-      const todoIndex = newTodo.findIndex(c => c.id === idTodo);
+    // ***********delete -todo;
+    case ACTION_TYPES.DELETE_TODO_REQUEST: {
+      return { ...state, isFatching: true, error: null };
+    }
+    case ACTION_TYPES.DELETE_TODO_SUCCESS: {
+      const { idtodo } = action;
+      const { todo } = state;
+      const newTodo = [...todo];
+      const todoIndex = newTodo.findIndex(t => t.id === idtodo);
       newTodo.splice(todoIndex, 1);
-
-      return { ...state, todo: newTodo };
+      return { ...state, todo: newTodo, isFatching: false };
     }
+    case ACTION_TYPES.DELETE_TODO_ERROR: {
+      const { err } = action;
+      return { ...state, error: err, isFatching: false };
+    }
+
     default:
       return state;
   }

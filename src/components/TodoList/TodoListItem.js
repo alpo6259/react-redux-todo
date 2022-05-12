@@ -1,20 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { checkedTodo, deleteTodo } from '../../actions/actionsCreate';
+import { deleteTodoAction, doneTodoAction } from '../../actions/actionsCreate';
 import CancelBoxIcon from 'mdi-react/CancelBoxIcon';
 
 import styles from './TodoListItem.module.scss';
 
 function TodoListItem (props) {
-  console.log('propslist', props);
   const {
-    todo: { id, name, isChek },
+    todo: { id, name, isDone },
     chekTodo,
     delTodo,
   } = props;
 
   const hendleChange = () => {
-    chekTodo({ isChek: !isChek }, id);
+    chekTodo(id, { isDone: !isDone });
   };
 
   const hendleDelete = () => {
@@ -25,12 +24,14 @@ function TodoListItem (props) {
     <li className={styles.list}>
       <div className={styles.listChek}>
         <input
-          className={styles.listCheckbox}
+          className={styles.listInfo}
           type='checkbox'
-          checked={isChek}
+          checked={isDone}
           onChange={hendleChange}
         />
-        <span className={styles.listInfo}>{name}</span>
+        <span className={isDone ? styles.listDone : styles.listInfo}>
+          {name}
+        </span>
       </div>
 
       <CancelBoxIcon
@@ -43,11 +44,11 @@ function TodoListItem (props) {
 }
 
 const mapDispatchToProps = dispatch => ({
-  chekTodo: (values, id) => {
-    dispatch(checkedTodo(values, id));
+  chekTodo: (id, values) => {
+    dispatch(doneTodoAction(id, values));
   },
   delTodo: id => {
-    dispatch(deleteTodo(id));
+    dispatch(deleteTodoAction(id));
   },
 });
 
